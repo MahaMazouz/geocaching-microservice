@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:   # <-- all containers go here
+
+  redis:
+    image: redis:7
+    container_name: redis-local
+    ports:
+      - "6379:6379"
+
+  geocaching:
+    build: .
+    container_name: geocaching-test
+    ports:
+      - "9000:9000"
+    command: >
+      sh -c "APP_PORT=9000 APP_HOST=0.0.0.0 node src/index.js"
+    environment:
+      LOG_SEVERITY: info
+
+      MASTER_REDIS_HOST: redis
+      MASTER_REDIS_PORT: 6379
+      MASTER_REDIS_DB: 0
+      MASTER_REDIS_PASSWORD: ""
+
+      SLAVE_REDIS_HOST: redis
+      SLAVE_REDIS_PORT: 6379
+      SLAVE_REDIS_DB: 0
+      SLAVE_REDIS_PASSWORD: ""
+    depends_on:
+      - redis

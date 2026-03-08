@@ -1,0 +1,69 @@
+{
+  "name": "geocaching-microservice",
+  "version": "1.12.0",
+  "description": "Nodejs API geocaching microservice using Fastify, Redis, Docker, and Google maps API",
+  "main": "src/index",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/box2home/geocaching-microservice"
+  },
+  "scripts": {
+    "start": "npm run lint && nodemon src/index",
+    "start:debug": "npm run lint && node --inspect-brk src/index.js",
+    "start:dev": "npm run lint && node src/index.js",
+    "start:prod": "npm run lint && node src/index.js",
+    "release": "npx -p @semantic-release/changelog@^5.0.0 -p @semantic-release/git@^9.0.0  -p semantic-release@^17.0.0 semantic-release --no-ci --debug",
+    "commit": "npx git-cz",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
+    "sonar-scanner": "node_modules/sonar-scanner/bin/sonar-scanner",
+    "sonar": "sonar-scanner",
+    "semantic-release": "semantic-release"
+  },
+  "author": "Karim SELMI",
+  "license": "MIT",
+  "dependencies": {
+    "@google/maps": "^1.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "elastic-apm-node": "^3.5.0",
+    "fastify": "^2.13.0",
+    "fastify-autoload": "^1.2.2",
+    "ioredis": "^4.16.0",
+    "lodash": "^4.17.15",
+    "request": "^2.88.1",
+    "request-promise-native": "^1.0.7",
+    "sonar-scanner": "^3.1.0",
+    "url-join": "^4.0.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jest": "^23.8.2",
+    "eslint-plugin-node": "^11.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^4.2.3",
+    "jest": "^25.1.0",
+    "lint-staged": "^10.0.8",
+    "nodemon": "^2.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
+    }
+  }
+}
