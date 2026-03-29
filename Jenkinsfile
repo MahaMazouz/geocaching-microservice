@@ -49,8 +49,8 @@ pipeline {
         stage('SonarQube analysis') {
     agent {
         docker {
-            image 'sonarsource/sonar-scanner-cli:4.8'
-            args '-u root:root -e SONAR_SCANNER_OPTS=--add-opens=java.base/java.lang=ALL-UNNAMED'
+            image 'sonarsource/sonar-scanner-cli:4.6'
+            args '-u root:root'
         }
     }
     when {
@@ -62,7 +62,7 @@ pipeline {
     }
     steps {
         withSonarQubeEnv('SonarQube') {
-            sh 'sonar-scanner -X'
+            sh 'sonar-scanner'
         }
     }
 }
