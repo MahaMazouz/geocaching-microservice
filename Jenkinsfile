@@ -55,7 +55,7 @@ stage('SonarQube analysis') {
             }
             steps {
                 withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${github-token}"'
                 }
                 withSonarQubeEnv('SonarQube') {
                     sh 'chmod +x sonar_quality.sh'
