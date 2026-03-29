@@ -65,14 +65,11 @@ pipeline {
         }
 
         withSonarQubeEnv('SonarQube') {
-            sh 'chmod +x sonar_quality.sh'
-            sh 'npm install'
-            sh 'chmod -R +x node_modules/.bin'
-            sh 'npx sonar-scanner'
-            sh './sonar_quality.sh'
+                    sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
+                    sh './sonar_quality.sh'
+                }
+            }
         }
-    }
-}
 
         stage('Quality gate') {
             when {
