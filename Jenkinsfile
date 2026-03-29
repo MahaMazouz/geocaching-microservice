@@ -18,7 +18,8 @@ pipeline {
 
         stage('Run Container') {
             steps {
-                sh 'docker run -d -p 9000:9000 geocaching-microservice'
+                sh 'docker rm -f geocaching-app || true'
+                sh 'docker run -d --name geocaching-app -p 9000:9000 geocaching-microservice'
             }
         }
 
