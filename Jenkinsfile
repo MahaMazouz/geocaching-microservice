@@ -47,25 +47,22 @@ pipeline {
         }
 
         stage('SonarQube analysis') {
-    agent {
-        docker {
-            image 'sonarsource/sonar-scanner-cli:4.6'
-            args '-u root:root'
+
+          when { expression {
+
+                    return (env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'pre/rc' )
+            }}
+
+            steps {
+                withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]) {
+                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+                }
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
+                    sh './sonar_quality.sh'
+                }
+            }
         }
-    }
-    when {
-        expression {
-            return env.shouldBuild != "false" &&
-                   env.BRANCH_NAME != 'master' &&
-                   env.BRANCH_NAME != 'pre/rc'
-        }
-    }
-    steps {
-        withSonarQubeEnv('SonarQube') {
-            sh 'sonar-scanner'
-        }
-    }
-}
 
         stage('Quality gate') {
             when {
