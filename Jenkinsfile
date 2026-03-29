@@ -54,8 +54,9 @@ stage('SonarQube analysis') {
                 }
             }
             steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${github-token}"'
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+
                 }
                 withSonarQubeEnv('SonarQube') {
                     sh 'chmod +x sonar_quality.sh'
@@ -92,9 +93,9 @@ stage('SonarQube analysis') {
                 }
             }
             steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                    sh 'npm run release'
-                }
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+    sh 'npm run release'
+}
             }
         }
 
