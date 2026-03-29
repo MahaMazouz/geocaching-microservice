@@ -22,6 +22,7 @@ pipeline {
                 sh 'docker run -d --name geocaching-app -p 9000:9000 geocaching-microservice'
             }
         }
+        
 
     }
 }
