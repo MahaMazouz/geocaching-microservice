@@ -46,26 +46,32 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis') {
-            when {
-                expression {
-                    return env.shouldBuild != "false" &&
-                           env.BRANCH_NAME != 'master' &&
-                           env.BRANCH_NAME != 'pre/rc'
-                }
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
-                }
-                withSonarQubeEnv('SonarQube') {
-                    sh 'chmod +x sonar_quality.sh'
-                    sh 'npm i'
-                    sh 'npm run sonar'
-                    sh './sonar_quality.sh'
-                }
-            }
+       stage('SonarQube analysis') {
+    agent {
+        docker {
+            image 'node:18-alpine'
         }
+    }
+    when {
+        expression {
+            return env.shouldBuild != "false" &&
+                   env.BRANCH_NAME != 'master' &&
+                   env.BRANCH_NAME != 'pre/rc'
+        }
+    }
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+            sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+        }
+
+        withSonarQubeEnv('SonarQube') {
+            sh 'chmod +x sonar_quality.sh'
+            sh 'npm install'
+            sh 'npm run sonar'
+            sh './sonar_quality.sh'
+        }
+    }
+}
 
         stage('Quality gate') {
             when {
