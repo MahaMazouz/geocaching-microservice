@@ -54,8 +54,8 @@ pipeline {
             }}
 
             steps {
-                withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]) {
-                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
+                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${github-token}"'
                 }
                 withSonarQubeEnv('SonarQube') {
                     sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
