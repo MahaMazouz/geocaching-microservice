@@ -10,6 +10,8 @@ pipeline {
             }
         }
 
+
+
         stage('Build Docker Image') {
             steps {
                 sh 'docker build -t geocaching-microservice .'
@@ -22,7 +24,7 @@ pipeline {
                 sh 'docker run -d --name geocaching-app -p 9000:9000 geocaching-microservice'
             }
         }
-        
+
 
     }
 }
