@@ -67,7 +67,8 @@ pipeline {
         withSonarQubeEnv('SonarQube') {
             sh 'chmod +x sonar_quality.sh'
             sh 'npm install'
-            sh 'npm run sonar'
+            sh 'chmod -R +x node_modules/.bin'
+            sh 'npx sonar-scanner'
             sh './sonar_quality.sh'
         }
     }
@@ -87,7 +88,7 @@ pipeline {
                 }
             }
         }
-        
+
 
         stage('Git release') {
             environment {
