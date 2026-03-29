@@ -46,27 +46,27 @@ pipeline {
             }
         }
 
-       stage('SonarQube analysis') {
-    agent {
-        docker {
-            image 'node:18-alpine'
-        }
-    }
-    when {
-        expression {
-            return env.shouldBuild != "false" &&
-                   env.BRANCH_NAME != 'master' &&
-                   env.BRANCH_NAME != 'pre/rc'
-        }
-    }
-    steps {
-        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-            sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
-        }
+        stage('SonarQube analysis') {
+            agent {
+                docker {
+                    image 'sonarsource/sonar-scanner-cli:latest'
+                    args '-u root:root'
+                }
+            }
+            when {
+                expression {
+                    return env.shouldBuild != "false" &&
+                           env.BRANCH_NAME != 'master' &&
+                           env.BRANCH_NAME != 'pre/rc'
+                }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}" || true'
+                }
 
-        withSonarQubeEnv('SonarQube') {
-                    sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
-                    sh './sonar_quality.sh'
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
                 }
             }
         }
@@ -86,14 +86,14 @@ pipeline {
             }
         }
 
-
         stage('Git release') {
             environment {
                 HOME = '.'
             }
             when {
                 expression {
-                    return env.shouldBuild != "false" && releaseBranches.contains(env.BRANCH_NAME)
+                    return env.shouldBuild != "false" &&
+                           releaseBranches.contains(env.BRANCH_NAME)
                 }
             }
             steps {
