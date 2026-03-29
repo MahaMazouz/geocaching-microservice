@@ -54,7 +54,7 @@ stage('SonarQube analysis') {
                 }
             }
             steps {
-                withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
                     sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
                 }
                 withSonarQubeEnv('SonarQube') {
@@ -92,7 +92,7 @@ stage('SonarQube analysis') {
                 }
             }
             steps {
-                withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]) {
+                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
                     sh 'npm run release'
                 }
             }
@@ -108,7 +108,7 @@ stage('SonarQube analysis') {
                 script{
                     if(releaseBranches.contains(env.BRANCH_NAME)){
                         slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
-                        withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]){
+                        withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]){
                             env.tag = sh (returnStdout: true, script: "make retrivetag organization=${microservice_organization} repository=${microservice_repository}")
                             sh 'make makefile deliver_image_to_dockerhub NAME="${dockerhub_organization}/${dockerhub_repository}" organization=${microservice_organization} repository=${microservice_repository}'
                         }
