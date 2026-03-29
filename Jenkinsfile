@@ -32,6 +32,29 @@ pipeline {
             }
         }
 
+        stage('Git release'){
+            agent{
+                docker {image 'timbru31/node-alpine-git'}
+            }
+            environment {
+                 HOME = '.'
+            }
+            when{
+                expression{
+                    return env.shouldBuild != "false"
+                }
+            }
+            steps{
+                script{
+                    if(releaseBranches.contains(env.BRANCH_NAME)){
+                        withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]){
+                            sh 'npm run release'
+                        }
+                    }
+                }
+            }
+        }
+
 
     }
 }
