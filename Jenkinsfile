@@ -58,7 +58,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Run Container') {
             steps {
                 sh 'docker rm -f geocaching-app || true'
@@ -68,4 +68,6 @@ pipeline {
 
 
     }
+
+}
 }
