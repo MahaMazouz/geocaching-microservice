@@ -46,26 +46,25 @@ pipeline {
             }
         }
 stage('SonarQube analysis') {
-            when {
-                expression {
-                    return env.shouldBuild != "false" &&
-                           env.BRANCH_NAME != 'master' &&
-                           env.BRANCH_NAME != 'pre/rc'
-                }
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
-
-                }
-                withSonarQubeEnv('SonarQube') {
-                    sh 'chmod +x sonar_quality.sh'
-                    sh 'npm i'
-                    sh 'npm run sonar'
-                    sh './sonar_quality.sh'
-                }
-            }
+    when {
+        expression {
+            return env.shouldBuild != "false" &&
+                   env.BRANCH_NAME != 'master' &&
+                   env.BRANCH_NAME != 'pre/rc'
         }
+    }
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+            sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+        }
+        withSonarQubeEnv('SonarQube') {
+            sh 'chmod +x sonar_quality.sh'
+            sh 'npm i'
+            sh 'npm run sonar'
+            sh './sonar_quality.sh'
+        }
+    }
+}
 
         stage('Quality gate') {
             when {
@@ -84,21 +83,20 @@ stage('SonarQube analysis') {
 
 
         stage('Git release') {
-            environment {
-                HOME = '.'
-            }
-            when {
-                expression {
-                    return env.shouldBuild != "false" && releaseBranches.contains(env.BRANCH_NAME)
-                }
-            }
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-    sh 'npm run release'
-}
-            }
+    environment {
+        HOME = '.'
+    }
+    when {
+        expression {
+            return env.shouldBuild != "false" && releaseBranches.contains(env.BRANCH_NAME)
         }
-
+    }
+    steps {
+        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+            sh 'npm run release'
+        }
+    }
+}
         stage ('Releasing Docker Image'){
             when{
                 expression{
