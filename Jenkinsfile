@@ -45,6 +45,42 @@ pipeline {
                 sh 'docker run -d --name geocaching-app -p 9000:9000 geocaching-microservice'
             }
         }
+stage('SonarQube analysis') {
+            when {
+                expression {
+                    return env.shouldBuild != "false" &&
+                           env.BRANCH_NAME != 'master' &&
+                           env.BRANCH_NAME != 'pre/rc'
+                }
+            }
+            steps {
+                withCredentials([string(credentialsId: 'GH_TOKEN', variable: 'GH_TOKEN')]) {
+                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+                }
+                withSonarQubeEnv('SonarQube') {
+                    sh 'chmod +x sonar_quality.sh'
+                    sh 'npm i'
+                    sh 'npm run sonar'
+                    sh './sonar_quality.sh'
+                }
+            }
+        }
+
+        stage('Quality gate') {
+            when {
+                expression {
+                    return env.shouldBuild != "false" &&
+                           env.BRANCH_NAME != 'master' &&
+                           env.BRANCH_NAME != 'pre/rc'
+                }
+            }
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
 
         stage('Git release') {
             environment {
