@@ -87,6 +87,7 @@ pipeline {
                 }
             }
         }
+        
 
         stage('Git release') {
             environment {
