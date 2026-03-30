@@ -47,24 +47,31 @@ pipeline {
         }
 
         stage('SonarQube analysis') {
-
-          when { expression {
-
-                    return (env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'pre/rc' )
-            }}
-
-             steps {
+    agent {
+        docker {
+            image 'node:18-alpine'
+            args '-u root:root'
+        }
+    }
+    when {
+        expression {
+            return env.shouldBuild != "false" &&
+                   env.BRANCH_NAME != 'master' &&
+                   env.BRANCH_NAME != 'pre/rc'
+        }
+    }
+    steps {
         withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
             sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
         }
-                withSonarQubeEnv('SonarQube') {
-                    sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
-                    sh './sonar_quality.sh'
-                }
-            }
-
-            
+        withSonarQubeEnv('SonarQube') {
+            sh 'chmod +x sonar_quality.sh'
+            sh 'npm i'
+            sh 'npm run sonar'
+            sh './sonar_quality.sh'
         }
+    }
+}
 
         stage('Quality gate') {
             when {
