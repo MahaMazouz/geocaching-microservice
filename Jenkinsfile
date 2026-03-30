@@ -73,6 +73,7 @@ pipeline {
     }
 }
 
+
         stage('Quality gate') {
             when {
                 expression {
