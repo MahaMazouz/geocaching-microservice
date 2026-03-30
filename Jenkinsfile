@@ -53,10 +53,10 @@ pipeline {
                     return (env.BRANCH_NAME != 'master' && env.BRANCH_NAME != 'pre/rc' )
             }}
 
-            steps {
-                withCredentials([string(credentialsId: 'github-token', variable: 'github-token')]) {
-                    sh 'npm config set "//npm.pkg.github.com/:_authToken" "${github-token}"'
-                }
+             steps {
+        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+            sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
+        }
                 withSonarQubeEnv('SonarQube') {
                     sh 'sudo chmod +x sonar_quality.sh && npm i && npm run sonar'
                     sh './sonar_quality.sh'
