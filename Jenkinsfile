@@ -62,6 +62,8 @@ pipeline {
                     sh './sonar_quality.sh'
                 }
             }
+
+            
         }
 
         stage('Quality gate') {
