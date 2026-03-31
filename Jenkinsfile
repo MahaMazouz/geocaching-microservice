@@ -61,7 +61,7 @@ pipeline {
         }
     }
     steps {
-        sh 'apt-get update && apt-get install -y openjdk-11-jre'
+        sh 'apt-get update && apt-get install -y openjdk-11-jre jq'
 
         withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
             sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
