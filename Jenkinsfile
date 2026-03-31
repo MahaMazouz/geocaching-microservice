@@ -46,10 +46,10 @@ pipeline {
             }
         }
 
-        stage('SonarQube analysis') {
+       stage('SonarQube analysis') {
     agent {
         docker {
-            image 'node:18-alpine'
+            image 'node:18-bullseye'
             args '-u root:root'
         }
     }
@@ -61,9 +61,12 @@ pipeline {
         }
     }
     steps {
+        sh 'apt-get update && apt-get install -y openjdk-11-jre'
+
         withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
             sh 'npm config set "//npm.pkg.github.com/:_authToken" "${GH_TOKEN}"'
         }
+
         withSonarQubeEnv('SonarQube') {
             sh 'chmod +x sonar_quality.sh'
             sh 'npm i'
