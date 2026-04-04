@@ -123,20 +123,27 @@ pipeline {
     }
     steps {
         script {
+            def currentBranch = env.BRANCH_NAME ?: env.GIT_BRANCH?.replace('origin/', '')?.replace('refs/remotes/origin/', '')
+
             echo "BRANCH_NAME = ${env.BRANCH_NAME}"
+            echo "GIT_BRANCH = ${env.GIT_BRANCH}"
+            echo "currentBranch = ${currentBranch}"
             echo "releaseBranches = ${releaseBranches}"
 
-            if (releaseBranches.contains(env.BRANCH_NAME)) {
+            if (releaseBranches.contains(currentBranch)) {
                 echo "Inside release block"
+
                 slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
+
                 withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
                     env.tag = sh(
                         returnStdout: true,
-                        script: "make retrivetag organization=${microservice_organization} repository=${microservice_repository}"
+                        script: "make retrivetag"
                     ).trim()
 
                     sh 'make deliver_image_to_dockerhub'
                 }
+
                 slackSend color: "good", message: "Image released \\n Tag : ${env.tag}"
             } else {
                 echo "Branch not allowed for release"
@@ -144,6 +151,7 @@ pipeline {
         }
     }
 }
+
     }
 }
 
