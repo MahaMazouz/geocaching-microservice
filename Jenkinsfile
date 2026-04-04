@@ -116,28 +116,34 @@ pipeline {
         }
 
         stage('Releasing Docker Image') {
-            when {
-                expression {
-                    return env.shouldBuild != "false"
-                }
-            }
-            steps {
-                script {
-                    if (releaseBranches.contains(env.BRANCH_NAME)) {
-                        slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
-                        withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
-                            env.tag = sh(
-                                returnStdout: true,
-                                script: "make retrivetag organization=${microservice_organization} repository=${microservice_repository}"
-                            ).trim()
+    when {
+        expression {
+            return env.shouldBuild != "false"
+        }
+    }
+    steps {
+        script {
+            echo "BRANCH_NAME = ${env.BRANCH_NAME}"
+            echo "releaseBranches = ${releaseBranches}"
 
-                            sh 'make makefile deliver_image_to_dockerhub NAME="${dockerhub_organization}/${dockerhub_repository}" organization=${microservice_organization} repository=${microservice_repository}'
-                        }
-                        slackSend color: "good", message: "Image released \\n Tag : ${env.tag}"
-                    }
+            if (releaseBranches.contains(env.BRANCH_NAME)) {
+                echo "Inside release block"
+                slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
+                withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
+                    env.tag = sh(
+                        returnStdout: true,
+                        script: "make retrivetag organization=${microservice_organization} repository=${microservice_repository}"
+                    ).trim()
+
+                    sh 'make deliver_image_to_dockerhub'
                 }
+                slackSend color: "good", message: "Image released \\n Tag : ${env.tag}"
+            } else {
+                echo "Branch not allowed for release"
             }
         }
+    }
+}
     }
 }
 
