@@ -133,7 +133,7 @@ pipeline {
             if (releaseBranches.contains(currentBranch)) {
                 echo "Inside release block"
 
-                slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
+               //  slackSend color: "#2222FF", message: "Releasing Image to DockerHub :whale:"
 
                 withCredentials([usernamePassword(credentialsId: 'github-token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GH_TOKEN')]) {
                     env.tag = sh(
@@ -144,7 +144,7 @@ pipeline {
                     sh 'make deliver_image_to_dockerhub'
                 }
 
-                slackSend color: "good", message: "Image released \\n Tag : ${env.tag}"
+               //  slackSend color: "good", message: "Image released \\n Tag : ${env.tag}"
             } else {
                 echo "Branch not allowed for release"
             }
